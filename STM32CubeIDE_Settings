@@ -1,23 +1,19 @@
-Click RCC → High Speed Clock (HSE) to Crystal/Ceramic Resonator
+1.1 Trong RCC chọn High Speed Clock (HSE) to Crystal/Ceramic 
+Resonator:
+- RCC (Reset and Clock Control) cung cấp các cài đặt liên quan đến các nguồn xung clock và các tham số đồng hồ khác của vi điều khiển.
+- "HSE" trong cài đặt này đề cập đến "High-Speed External" (bên ngoài tốc độ cao), một nguồn xung clock có thể được sử dụng bên ngoài vi điều khiển từ một tinh thể (crystal) hoặc bộ kích thích sự rung (ceramic resonator) để cung cấp xung clock cho vi điều khiển.
+- chọn "High Speed Clock (HSE) to Crystal/Ceramic Resonator" trong cài đặt của vi điều khiển để cấu hình vi điều khiển sử dụng tinh thể hoặc ceramic resonator như nguồn xung clock chính cho hệ thống.
+1.2 Trong Clock Configuration tab chọn HCLK (MHz) bằng 72:
+-  HCLK (High-Speed Bus Clock) là một tro ng các bus chính trong vi điều khiển STM32. Nó cung cấp tín hiệu clock cho nhiều phần khác nhau trong vi điều khiển, bao gồm CPU, bus định hướng, bộ nhớ, các module ngoại vi và các chức năng khác.
+- cấu hình HCLK lên 72MHz để đáp ứng nhu cầu xử lý tốc độ cao 
+1.3 Trong Pinout and Configuration tab chọn Timer → TIM1 →Clock 
+Source set to Internal Clock:
+"Clock Source set to Internal Clock" đề cập đến việc thiết lập nguồn xung clock cho Timer 1 là nguồn xung clock nội (internal clock) của vi điều khiển. Điều này có nghĩa là Timer 1 sẽ sử dụng tín hiệu xung clock được tạo bởi bộ sinh xung nội của vi điều khiển, không phụ thuộc vào bất kỳ nguồn xung clock ngoại vi (ví dụ như tinh thể hoặc nguồn clock ngoại khác).
+1.4 Configuration → Parameter Settings → Prescaler set to 71:
+- Trong các vi điều khiển như STM32, Prescaler (bộ chia tần số) thường được sử dụng để chia tần số của clock đầu vào của một bộ chức năng như Timer (bộ đếm thời gian). Việc này giúp thay đổi tốc độ đếm của bộ đếm thời gian.
+- Khi Prescaler được thiết lập thành 71, nó sẽ chia tần số đầu vào của  Timer đi một tỉ lệ 1:71 trước khi Timer bắt đầu đếm. Điều này có nghĩa là số xung clock từ nguồn đầu vào sẽ được chia nhỏ hơn 71 lần trước khi được sử dụng để đếm. Khi Prescaler được thiết lập thành 71, nó sẽ chia tần số đầu vào của Timer đi một tỉ lệ 1:71 trước khi Timer bắt đầu đếm. Điều này có nghĩa là số xung clock từ nguồn đầu vào sẽ được chia nhỏ hơn 71 lần trước khi được sử dụng để đếm. Ví dụ, nếu tần số nguồn đầu vào của Timer là 1 MHz và bạn đặt Prescaler là 71, thì thay vì Timer đếm theo tần số 1 MHz, nó sẽ chỉ đếm với tần số 1 MHz / 71 ≈ 14.08 kHz.
+1.5 Set PB9 GPIO_Output:  thiết lập chân GPIO có mã PB9 trên vi điều khiển STM32 thành chế độ đầu ra (Output).
 
-Click Clock Configuration tab → HCLK (MHz) to 72
+1.6 Chọn connectivity --> I2C1 --> For I2C select I2C: lựa chọn để cấu hình I2C1 để hoạt động với giao thức I2C
 
-Click Pinout and Configuration tab
-
-Click Timer → Click TIM1 →
-
-Clock Source set to Internal Clock
-
-Configuration → Parameter Settings →
-
-Prescaler set to 71
-
-Set PB9 GPIO_Output
-
-Click connectivity --> Click I2C1
-
-For I2C select I2C
-
-Configuration --> Parameter Settings
-
-For I2C speed select Fast Mode
+1.7 Trong Configuration --> Parameter Settings --> For I2C speed select Fast Mode: Giao thức I2C có thể hoạt động ở nhiều tốc độ khác nhau, và một trong những tốc độ phổ biến là "Fast Mode". Fast Mode I2C có tốc độ truyền dữ liệu lên đến 400kHz.
