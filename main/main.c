@@ -23,6 +23,10 @@ uint32_t pMillis, cMillis;
 float temp_Celsius = 0;
 float temp_Fahrenheit = 0;
 float Humidity = 0;
+int giay=0;
+int phut=0;
+int gio=0;
+int nho;
 uint8_t hum_integral, hum_decimal, tempC_integral, tempC_decimal, tempF_integral, tempF_decimal;
 char string[15];
 
@@ -40,19 +44,19 @@ uint8_t DHT22_Start (void)
   GPIO_InitStructPrivate.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStructPrivate.Speed = GPIO_SPEED_FREQ_LOW;
   GPIO_InitStructPrivate.Pull = GPIO_NOPULL;
-  
+
   HAL_GPIO_Init(DHT22_PORT, &GPIO_InitStructPrivate);
   HAL_GPIO_WritePin (DHT22_PORT, DHT22_PIN, 0);
   microDelay (1300);
-  
+
   HAL_GPIO_WritePin (DHT22_PORT, DHT22_PIN, 1);
   microDelay (30);
-  
+
   GPIO_InitStructPrivate.Mode = GPIO_MODE_INPUT;
   GPIO_InitStructPrivate.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(DHT22_PORT, &GPIO_InitStructPrivate);
   microDelay (40);
-  
+
   if (!(HAL_GPIO_ReadPin (DHT22_PORT, DHT22_PIN)))
   {
     microDelay (80);
@@ -101,10 +105,10 @@ int main(void)
   MX_TIM1_Init();
     HAL_TIM_Base_Start(&htim1);
     SSD1306_Init();
-    
+
   while (1)
   {
-	  if(DHT22_Start())
+		  if(DHT22_Start())
 	  	     {
 	  	       hum1 = DHT22_Read();
 	  	       hum2 = DHT22_Read();
@@ -123,14 +127,14 @@ int main(void)
 	  	           temp_Celsius = (float)((tempC1<<8)|tempC2)/10;
 	  	         }
 
-	  	    /*     temp_Fahrenheit = temp_Celsius * 9/5 + 32;  */
+	  	        temp_Fahrenheit = temp_Celsius * 9/5 + 32;
 
 	  	         Humidity = (float) ((hum1<<8)|hum2)/10;
 
 	  	         SSD1306_GotoXY (0, 0);
 	  	         hum_integral = Humidity;
 	  	         hum_decimal = Humidity*10-hum_integral*10;
-	  	         sprintf(string," DA: %d.%d %%  ", hum_integral, hum_decimal);
+	  	         sprintf(string,"DA:%d.%d %%", hum_integral, hum_decimal);
 	  	         SSD1306_Puts (string, &Font_11x18, 1);
 
 	  	         SSD1306_GotoXY (0, 20);
@@ -138,18 +142,18 @@ int main(void)
 	  	         {
 	  	           tempC_integral = temp_Celsius *(-1);
 	  	           tempC_decimal = temp_Celsius*(-10)-tempC_integral*10;
-	  	           sprintf(string," ND: -%d.%d C   ", tempC_integral, tempC_decimal);
+	  	           sprintf(string,"ND:-%d.%d C", tempC_integral, tempC_decimal);
 	  	         }
 	  	         else
 	  	         {
 	  	           tempC_integral = temp_Celsius;
 	  	           tempC_decimal = temp_Celsius*10-tempC_integral*10;
-	  	           sprintf(string," ND: %d.%d C   ", tempC_integral, tempC_decimal);
+	  	           sprintf(string,"ND:%d.%d C", tempC_integral, tempC_decimal);
 	  	         }
 	  	         SSD1306_Puts (string, &Font_11x18, 1);
 
-	  	         SSD1306_GotoXY (0, 40);
-	  	 /*        if(temp_Fahrenheit < 0)
+	  	        /* SSD1306_GotoXY (0, 40);
+	  	         if(temp_Fahrenheit < 0)
 	  	         {
 	  	           tempF_integral = temp_Fahrenheit*(-1);
 	  	           tempF_decimal = temp_Fahrenheit*(-10)-tempF_integral*10;
@@ -161,46 +165,49 @@ int main(void)
 	  	           tempF_decimal = temp_Fahrenheit*10-tempF_integral*10;
 	  	           sprintf(string,"%d.%d F   ", tempF_integral, tempF_decimal);
 	  	         }
-	  	         SSD1306_Puts (string, &Font_11x18, 1);
-	  	         SSD1306_UpdateScreen(); */
+
+	  	         SSD1306_Puts (string, &Font_11x18, 1); */
+	  	         SSD1306_UpdateScreen();
 	  	       }
 
-	  	     if (temp_Celsius >38 )
+	  	     if (temp_Celsius >38 ) //pd6=L
 	  	    	     {
 	  	    	  	   HAL_GPIO_TogglePin(L_GPIO_Port, L_Pin);
 	  	    	  	   HAL_GPIO_WritePin(L_GPIO_Port,L_Pin,SET);			//đèn tắt
-	  	    	      }
-			else 
+
+	  	    	     }
+			else
 			     {
 				   HAL_GPIO_TogglePin(L_GPIO_Port, L_Pin);
-	  	  	  	   HAL_GPIO_WritePin(L_GPIO_Port,L_Pin,RESET);
-			     }			  	    	  	         
-	  	   if (Humidity > 65)
+	  	  	  	   HAL_GPIO_WritePin(L_GPIO_Port,L_Pin,RESET);			// đèn bật
+
+			     }
+	  	   if (Humidity > 65)  //pd7=F
 	  	  	      {
 	  	  	  	    HAL_GPIO_TogglePin(F_GPIO_Port, F_Pin);
-	  	  	  	    HAL_GPIO_WritePin(F_GPIO_Port,F_Pin,SET);    			//QUAT TAT
-			      }
+	  	  	  	    HAL_GPIO_WritePin(F_GPIO_Port,F_Pin,RESET);    			//quạt tắt
+
+	  	  	      }
 			else
 			      {
 				    HAL_GPIO_TogglePin(F_GPIO_Port, F_Pin);
-	  	    	  	    HAL_GPIO_WritePin(F_GPIO_Port,F_Pin,RESET);			// quạt chạy
-	  	     	      }
-	  	     HAL_Delay(500);
-	    }
-	  }
-  
-}
+	  	    	  	    HAL_GPIO_WritePin(F_GPIO_Port,F_Pin,SET);			// quạt bật
 
+			      }
+	  	    // HAL_Delay(100);
+	    }
+
+  }}
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-  
+
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
-  
+
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
@@ -215,7 +222,7 @@ void SystemClock_Config(void)
     Error_Handler();
   }
 
-  
+
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
@@ -265,60 +272,93 @@ static void MX_TIM1_Init(void)
     Error_Handler();
   }
   sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-  
+
   if (HAL_TIM_ConfigClockSource(&htim1, &sClockSourceConfig) != HAL_OK)
   {
     Error_Handler();
   }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  
+
   if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK)
   {
     Error_Handler();
   }
 }
-
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
+/* USER CODE BEGIN MX_GPIO_Init_1 */
+/* USER CODE END MX_GPIO_Init_1 */
 
+  /* GPIO Ports Clock Enable */
+ // __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
-  HAL_GPIO_WritePin(L_GPIO_Port, L_Pin, GPIO_PIN_SET);
+  /*Configure GPIO pin Output Level */
 
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
 
-  HAL_GPIO_WritePin(F_GPIO_Port, F_Pin, GPIO_PIN_SET);
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOD, L_Pin|F_Pin, GPIO_PIN_SET);
 
-  GPIO_InitStruct.Pin = L_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(L_GPIO_Port, &GPIO_InitStruct);
 
+
+  /*Configure GPIO pin : PB14 */
   GPIO_InitStruct.Pin = GPIO_PIN_14;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  GPIO_InitStruct.Pin = F_Pin;
+  /*Configure GPIO pins : L_Pin F_Pin */
+  GPIO_InitStruct.Pin = L_Pin|F_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(F_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
+/* USER CODE BEGIN MX_GPIO_Init_2 */
+/* USER CODE END MX_GPIO_Init_2 */
 }
 
+/* USER CODE BEGIN 4 */
+
+/* USER CODE END 4 */
+
+/**
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
 void Error_Handler(void)
-{}
+{
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
+  __disable_irq();
+  while (1)
+  {
+  }
+  /* USER CODE END Error_Handler_Debug */
+}
 
 #ifdef  USE_FULL_ASSERT
-
+/**
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
 void assert_failed(uint8_t *file, uint32_t line)
-{}
-#endif 
+{
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
+}
+#endif /* USE_FULL_ASSERT */
